@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stores</title>
+</head>
+<body>
+
+    <h1>Stores</h1>
+
+    <a href="{% url 'shop:create_store' %}">Create Store</a>
+
+    <hr>
+
+    {% for store in stores %}
+        <h2>{{ store.name }}</h2>
+
+        <p>{{ store.description }}</p>
+
+        <p>Owner: {{ store.owner.username }}</p>
+
+        <a href="{% url 'shop:edit_store' store.id %}">Edit</a>
+
+        <a href="{% url 'shop:delete_store' store.id %}">Delete</a>
+
+        <hr>
+    {% empty %}
+        <p>No stores have been created yet.</p>
+    {% endfor %}
+
+    <br>
+
+    <a href="{% url 'shop:product_list' %}">View Products</a>
+    <br>
+    <a href="{% url 'shop:welcome' %}">Back to Welcome</a>
+
+</body>
+</html>

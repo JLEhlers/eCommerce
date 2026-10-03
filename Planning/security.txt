@@ -1,0 +1,5 @@
+Security:
+
+-Users must login
+-Buyers can only change carts and orders
+-Passwords are securely stored

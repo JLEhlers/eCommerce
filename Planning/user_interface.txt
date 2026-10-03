@@ -1,0 +1,8 @@
+Main Pages:
+
+-Home page
+-Login
+-Registration
+-Products
+-Cart
+-Checkout

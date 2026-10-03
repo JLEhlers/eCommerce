@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Products</title>
+</head>
+<body>
+
+    <h1>My Products</h1>
+
+    <a href="{% url 'shop:add_product' %}">Add Product</a>
+
+    <hr>
+
+    {% for product in products %}
+
+        <h2>{{ product.name }}</h2>
+
+        <p>{{ product.description }}</p>
+
+        <p>Price: ${{ product.price }}</p>
+
+        <p>Stock: {{ product.stock }}</p>
+
+        {% if product.store %}
+            <p>Store: {{ product.store.name }}</p>
+        {% endif %}
+
+        <a href="{% url 'shop:edit_product' product.id %}">
+            Edit
+        </a>
+
+        <a href="{% url 'shop:delete_product' product.id %}">
+            Delete
+        </a>
+
+        <hr>
+
+    {% empty %}
+
+        <p>You have no products yet.</p>
+
+    {% endfor %}
+
+    <br>
+
+    <a href="{% url 'shop:product_list' %}">
+        View All Products
+    </a>
+
+    <br>
+
+    <a href="{% url 'shop:welcome' %}">
+        Back to Welcome
+    </a>
+
+</body>
+</html>

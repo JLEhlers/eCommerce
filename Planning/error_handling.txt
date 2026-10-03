@@ -1,0 +1,6 @@
+Errors:
+
+-Failed login details will show error message
+-Incorrect registration will show error message
+-Users cannot purchase more items than there are in stock
+-Users cannot access pages they don't have permissions to use

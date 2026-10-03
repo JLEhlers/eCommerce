@@ -1,0 +1,12 @@
+Vendors:
+
+-Register and login 
+-Create, delete, view, and edit stores
+-Add, edit, and delete products
+
+Buyers:
+
+-Register and login
+-View and add products to cart
+-Purchase products
+-Leave reviews

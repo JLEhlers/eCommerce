@@ -1,0 +1,61 @@
+<h1>{{ product.name }}</h1>
+
+<p>{{ product.description }}</p>
+
+<p>Price: ${{ product.price }}</p>
+
+<p>Stock: {{ product.stock }}</p>
+
+
+<h2>Leave a Review</h2>
+
+<form method="POST" action="{% url 'shop:add_review' product.id %}">
+    {% csrf_token %}
+
+    <label for="rating">Rating:</label>
+
+    <select name="rating" id="rating">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+
+    <br><br>
+
+    <label for="comment">Comment:</label>
+
+    <br>
+
+    <textarea name="comment" id="comment"></textarea>
+
+    <br><br>
+
+    <button type="submit">Submit Review</button>
+</form>
+
+
+<h2>Reviews</h2>
+
+{% for review in reviews %}
+
+    <p>
+        <strong>{{ review.buyer.username }}</strong>
+    </p>
+
+    <p>Rating: {{ review.rating }}/5</p>
+
+    <p>{{ review.comment }}</p>
+
+    {% if review.verified %}
+        <p>Verified Purchase</p>
+    {% else %}
+        <p>Unverified Review</p>
+    {% endif %}
+
+{% empty %}
+
+    <p>No reviews yet.</p>
+
+{% endfor %}
