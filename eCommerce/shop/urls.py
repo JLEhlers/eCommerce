@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import basic_api_response, view_stores
 
 app_name = "shop"
 
@@ -26,6 +27,13 @@ urlpatterns = [
         name='logout'
     ),
 
+    # API
+    path(
+        "api/stores/",
+        views.basic_api_response,
+        name="basic_api_response"
+    ),
+
     # Registration
     path(
         'register/',
@@ -38,6 +46,16 @@ urlpatterns = [
         'welcome/',
         views.welcome,
         name='welcome'
+    ),
+    
+    # Basic API Response
+    path(
+        'basic_response/', basic_api_response
+    ),
+    
+    # View Stores
+    path(
+        'get/stores', view_stores
     ),
 
     # Stores

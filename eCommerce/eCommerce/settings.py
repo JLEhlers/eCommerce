@@ -132,3 +132,13 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework_xml.renderers.XMLRenderer',
+    )
+}
+
+
+LOGIN_URL = 'shop:login'

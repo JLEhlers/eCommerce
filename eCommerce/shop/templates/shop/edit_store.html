@@ -1,35 +1,90 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Store</title>
+
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
+
 </head>
-<body>
 
-    <h1>Edit Store</h1>
+<body class="bg-light">
 
-    <form method="POST">
-        {% csrf_token %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'shop:welcome' %}">
+            eCommerce
+        </a>
 
-        <label for="name">Store Name:</label>
-        <input type="text" name="name" id="name"
-               value="{{ store.name }}" required>
+        <a
+            href="{% url 'shop:logout' %}"
+            class="btn btn-outline-light"
+        >
+            Logout
+        </a>
+    </div>
+</nav>
 
-        <br><br>
+<main class="container mt-5">
 
-        <label for="description">Description:</label>
-        <br>
-        <textarea name="description" id="description">{{ store.description }}</textarea>
+    <div class="card shadow-sm">
+        <div class="card-body">
 
-        <br><br>
+            <h1 class="mb-4">Edit Store</h1>
 
-        <button type="submit">Save Changes</button>
-    </form>
+            <form method="POST">
+                {% csrf_token %}
 
-    <br>
+                <div class="mb-3">
+                    <label for="name" class="form-label">
+                        Store Name:
+                    </label>
 
-    <a href="{% url 'shop:store_list' %}">
-        Back to Stores
-    </a>
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        value="{{ store.name }}"
+                        class="form-control"
+                        required
+                    >
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label">
+                        Description:
+                    </label>
+
+                    <textarea
+                        name="description"
+                        id="description"
+                        class="form-control"
+                        rows="4"
+                    >{{ store.description }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark">
+                    Save Changes
+                </button>
+
+                <a
+                    href="{% url 'shop:store_list' %}"
+                    class="btn btn-outline-dark ms-2"
+                >
+                    Back to Stores
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</main>
 
 </body>
 </html>

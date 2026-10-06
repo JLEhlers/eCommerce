@@ -1,24 +1,127 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
+
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
+
 </head>
-<body>
 
-    <h1>Welcome to the eCommerce site!</h1>
+<body class="bg-light">
 
-    <p>You are logged in as {{ user.username }}.</p>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
 
-    <a href="{% url 'shop:store_list' %}">View Stores</a>
-    <br><br>
+        <a
+            class="navbar-brand"
+            href="{% url 'shop:welcome' %}"
+        >
+            eCommerce
+        </a>
 
-    <a href="{% url 'shop:product_list' %}">View Products</a>
-    <br><br>
+        <a
+            href="{% url 'shop:logout' %}"
+            class="btn btn-outline-light"
+        >
+            Logout
+        </a>
 
-    <a href="{% url 'shop:cart_page' %}">View Cart</a>
-    <br><br>
+    </div>
+</nav>
 
-    <a href="{% url 'shop:logout' %}">Logout</a>
+<main class="container mt-5">
+
+    <div class="text-center mb-5">
+
+        <h1>Welcome to the eCommerce site!</h1>
+
+        <p class="text-muted">
+            You are logged in as
+            <strong>{{ user.username }}</strong>.
+        </p>
+
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+
+                    <h2 class="h4">Stores</h2>
+
+                    <p class="text-muted">
+                        View available stores.
+                    </p>
+
+                    <a
+                        href="{% url 'shop:store_list' %}"
+                        class="btn btn-dark"
+                    >
+                        View Stores
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+
+                    <h2 class="h4">Products</h2>
+
+                    <p class="text-muted">
+                        Browse available products.
+                    </p>
+
+                    <a
+                        href="{% url 'shop:product_list' %}"
+                        class="btn btn-dark"
+                    >
+                        View Products
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+
+                    <h2 class="h4">Shopping Cart</h2>
+
+                    <p class="text-muted">
+                        View the products in your cart.
+                    </p>
+
+                    <a
+                        href="{% url 'shop:cart_page' %}"
+                        class="btn btn-dark"
+                    >
+                        View Cart
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
 
 </body>
 </html>

@@ -1,22 +1,62 @@
 {% block content %}
 
-<h2>Your cart:</h2>
+<div class="container mt-5">
 
-<table>
-    <tr>
-        <th>Product name</th>
-        <th>Quantity</th>
-        <th>Price</th>
-    </tr>
+<div class="card shadow-sm">
+    <div class="card-body">
 
-    {% for product in cart %}
-    <tr>
-        <td>{{ product.product.name }}</td>
-        <td>{{ product.quantity }}</td>
-        <td>{{ product.product.price }}</td>
-    </tr>
-    {% endfor %}
+        <h2 class="mb-4">Your Cart</h2>
 
-</table>
+        {% if cart %}
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for product in cart %}
+                        <tr>
+                            <td>{{ product.product.name }}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td>${{ product.product.price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <a
+                    href="{% url 'shop:checkout' %}"
+                    class="btn btn-dark"
+                >
+                    Checkout
+                </a>
+            </div>
+
+        {% else %}
+
+            <p class="text-muted">Your cart is empty.</p>
+
+            <a
+                href="{% url 'shop:product_list' %}"
+                class="btn btn-outline-dark"
+            >
+                Browse Products
+            </a>
+
+        {% endif %}
+
+    </div>
+</div>
+
+</div>
 
 {% endblock %}

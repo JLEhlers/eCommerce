@@ -1,61 +1,206 @@
-<h1>{{ product.name }}</h1>
+<!DOCTYPE html>
 
-<p>{{ product.description }}</p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }}</title>
 
-<p>Price: ${{ product.price }}</p>
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
 
-<p>Stock: {{ product.stock }}</p>
+</head>
 
+<body class="bg-light">
 
-<h2>Leave a Review</h2>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
 
-<form method="POST" action="{% url 'shop:add_review' product.id %}">
-    {% csrf_token %}
+        <a
+            class="navbar-brand"
+            href="{% url 'shop:welcome' %}"
+        >
+            eCommerce
+        </a>
 
-    <label for="rating">Rating:</label>
+        <a
+            href="{% url 'shop:logout' %}"
+            class="btn btn-outline-light"
+        >
+            Logout
+        </a>
 
-    <select name="rating" id="rating">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select>
+    </div>
+</nav>
 
-    <br><br>
+<main class="container mt-5">
 
-    <label for="comment">Comment:</label>
+    <div class="row">
 
-    <br>
+        <!-- Product Information -->
+        <div class="col-md-6 mb-4">
 
-    <textarea name="comment" id="comment"></textarea>
+            <div class="card shadow-sm">
+                <div class="card-body">
 
-    <br><br>
+                    <h1 class="mb-3">
+                        {{ product.name }}
+                    </h1>
 
-    <button type="submit">Submit Review</button>
-</form>
+                    <p class="text-muted">
+                        {{ product.description }}
+                    </p>
 
+                    <p>
+                        <strong>Price:</strong>
+                        ${{ product.price }}
+                    </p>
 
-<h2>Reviews</h2>
+                    <p>
+                        <strong>Stock:</strong>
+                        {{ product.stock }}
+                    </p>
 
-{% for review in reviews %}
+                </div>
+            </div>
 
-    <p>
-        <strong>{{ review.buyer.username }}</strong>
-    </p>
+        </div>
 
-    <p>Rating: {{ review.rating }}/5</p>
+        <!-- Leave a Review -->
+        <div class="col-md-6 mb-4">
 
-    <p>{{ review.comment }}</p>
+            <div class="card shadow-sm">
+                <div class="card-body">
 
-    {% if review.verified %}
-        <p>Verified Purchase</p>
-    {% else %}
-        <p>Unverified Review</p>
-    {% endif %}
+                    <h2 class="h4 mb-4">
+                        Leave a Review
+                    </h2>
 
-{% empty %}
+                    <form
+                        method="POST"
+                        action="{% url 'shop:add_review' product.id %}"
+                    >
+                        {% csrf_token %}
 
-    <p>No reviews yet.</p>
+                        <div class="mb-3">
 
-{% endfor %}
+                            <label
+                                for="rating"
+                                class="form-label"
+                            >
+                                Rating:
+                            </label>
+
+                            <select
+                                name="rating"
+                                id="rating"
+                                class="form-select"
+                            >
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label
+                                for="comment"
+                                class="form-label"
+                            >
+                                Comment:
+                            </label>
+
+                            <textarea
+                                name="comment"
+                                id="comment"
+                                class="form-control"
+                                rows="4"
+                            ></textarea>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn btn-dark"
+                        >
+                            Submit Review
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Reviews -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h2 class="mb-4">Reviews</h2>
+
+            {% for review in reviews %}
+
+                <div class="border-bottom pb-3 mb-3">
+
+                    <h3 class="h6 mb-2">
+                        {{ review.buyer.username }}
+                    </h3>
+
+                    <p class="mb-2">
+                        <strong>Rating:</strong>
+                        {{ review.rating }}/5
+                    </p>
+
+                    <p class="mb-2">
+                        {{ review.comment }}
+                    </p>
+
+                    {% if review.verified %}
+
+                        <span class="badge bg-success">
+                            Verified Purchase
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            Unverified Review
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% empty %}
+
+                <p class="text-muted">
+                    No reviews yet.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <a
+        href="{% url 'shop:product_list' %}"
+        class="btn btn-outline-dark mb-5"
+    >
+        Back to Products
+    </a>
+
+</main>
+
+</body>
+</html>
