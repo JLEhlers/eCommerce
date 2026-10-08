@@ -1,4 +1,4 @@
-# Import necessary modules and classes
+'''Import necessary modules and functions for the eCommerce application.'''
 import secrets
 from datetime import datetime, timedelta
 from functools import wraps
@@ -44,6 +44,7 @@ from .serializers import ProductSerializer, ReviewSerializer, StoreSerializer
 
 # Create a function to register a new user
 def register_user(request):
+    '''Register a new user and create a UserProfile with the selected role.'''
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -79,6 +80,7 @@ def register_user(request):
 
 # Create a function to log in a user
 def login_user(request):
+    '''Log in a user and redirect them to the welcome page.'''
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -98,6 +100,7 @@ def login_user(request):
 
 # Create a function to log out a user
 def logout_user(request):
+    '''Log out a user and redirect them to the login page.'''
     if request.user is not None:
         logout(request)
         return HttpResponseRedirect(reverse('shop:login'))
@@ -105,6 +108,7 @@ def logout_user(request):
 
 # Create a function to change a user's password
 def change_user_password(username, new_password):
+    '''Change a user's password and save the user object.'''
     user = User.objects.get(username=username)
     user.set_password(new_password)
     user.save()
@@ -113,14 +117,19 @@ def change_user_password(username, new_password):
 # Create a function to display the welcome page
 @login_required
 def welcome(request):
-    if request.user.is_authenticated:
-        return render(request, 'shop/welcome.html')
-    else:
-        return HttpResponseRedirect(reverse('shop:login'))
+    '''Display the welcome page based on the user's role.'''
+    if request.user.userprofile.role == "vendor":
+        return render(request, "shop/vendor_dashboard.html")
+
+    elif request.user.userprofile.role == "buyer":
+        return render(request, "shop/buyer_dashboard.html")
+
+    return redirect("shop:login")
 
 
 # Create a decorator to restrict access to vendors only
 def vendor_required(view_func):
+    '''Decorator to restrict access to vendors only.'''
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if (
@@ -138,6 +147,7 @@ def vendor_required(view_func):
 
 # Create a decorator to restrict access to buyers only
 def buyer_required(view_func):
+    '''Decorator to restrict access to buyers only.'''
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if (
@@ -157,6 +167,7 @@ def buyer_required(view_func):
 @api_view(['GET'])
 @renderer_classes((XMLRenderer,))
 def view_stores(request):
+    '''View all stores using the API and return the data in XML format.'''
     if request.method == "GET":
         stores = Store.objects.all()
         serializer = StoreSerializer(stores, many=True)
@@ -171,6 +182,7 @@ def view_stores(request):
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def add_store(request):
+    '''Allow authenticated vendors to add a store using the API.'''
     vendor_id = request.data.get('vendor')
 
     if vendor_id is None:
@@ -205,7 +217,7 @@ def add_store(request):
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def add_product_api(request):
-
+    '''Allow authenticated vendors to add a product using the API.'''
     if not hasattr(request.user, 'userprofile'):
         return Response(
             {"error": "User profile not found."},
@@ -302,6 +314,7 @@ def get_store_products(request, store_id):
 
 # Create a function to fetch and display Reddit posts
 def reddit_feed(request):
+    '''Fetch and display Reddit posts from a specified subreddit.'''
     # Call our helper function to fetch posts
     posts = get_reddit_posts("python")
 
@@ -311,6 +324,7 @@ def reddit_feed(request):
 
 # Create a function to display the product page
 def view_product_page(request):
+    '''Display the product page and handle product search.'''
     user = request.user
 
     if user.has_perm("shop.view_product"):
@@ -358,6 +372,7 @@ def view_product_page(request):
 @login_required
 @vendor_required
 def change_product_price(request):
+    '''Allow vendors to change the price of a product.'''
     user = request.user
 
     if user.has_perm("shop.change_product"):
@@ -392,11 +407,12 @@ def change_product_price(request):
 @login_required
 @buyer_required
 def add_item_to_cart(request):
+    '''Allow buyers to add an item to their cart.'''
     item = request.POST.get('item')
     quantity = request.POST.get('quantity')
 
     if not item or not quantity:
-        return redirect('cart_page')
+        return redirect('shop:cart_page')
 
     try:
         quantity = int(quantity)
@@ -416,13 +432,14 @@ def add_item_to_cart(request):
     request.session['cart'] = cart
     request.session.modified = True
 
-    return redirect('cart_page')
+    return redirect('shop:cart_page')
 
 
 # Create a function to retrieve products from the user's cart
 @login_required
 @buyer_required
 def retrieve_products(request):
+    '''Retrieve products from the user's cart and return them as a list.'''
     products = []
 
     session = request.session
@@ -447,6 +464,7 @@ def retrieve_products(request):
 @login_required
 @buyer_required
 def show_user_cart(request):
+    '''Show the user's cart and its contents.'''
     cart = retrieve_products(request)
 
     return render(
@@ -458,6 +476,7 @@ def show_user_cart(request):
 
 # Create a function to build an email for password reset
 def build_email(user, reset_url):
+    '''Build an email message for password reset and return it.'''
     subject = "Password Reset"
     user_email = user.email
     domain_email = "example@domain.com"
@@ -479,7 +498,7 @@ def build_email(user, reset_url):
 
 # Create a function to handle password reset requests
 def request_password_reset(request):
-
+    '''Handle password reset requests and send a reset email.'''
     if request.method == "POST":
 
         username = request.POST.get("username")
@@ -505,6 +524,7 @@ def request_password_reset(request):
 
 # Create a function to generate a reset URL for a user
 def generate_reset_url(user):
+    '''Generate a reset URL for a user and create a ResetToken.'''
     domain = "http://127.0.0.1:8000"
 
     url = f"{domain}/reset_password/"
@@ -526,6 +546,7 @@ def generate_reset_url(user):
 
 # Create a function to reset a user's password using a token
 def reset_user_password(request, token):
+    '''Reset a user's password using a token and render the password reset page.'''
     try:
         user_token = ResetToken.objects.get(
             token=sha1(token.encode()).hexdigest()
@@ -550,6 +571,7 @@ def reset_user_password(request, token):
 
 # Create a function to reset a user's password
 def reset_password(request):
+    '''Reset a user's password and redirect them to the login page.'''
     username = request.session['user']
     token = request.session['token']
 
@@ -577,6 +599,7 @@ def reset_password(request):
 @login_required
 @vendor_required
 def edit_store(request, store_id):
+    '''Edit a store's details and save the changes.'''
     store = Store.objects.get(
         id=store_id,
         owner=request.user
@@ -600,6 +623,7 @@ def edit_store(request, store_id):
 @login_required
 @vendor_required
 def delete_store(request, store_id):
+    '''Delete a store and redirect to the store list.'''
     store = Store.objects.get(
         id=store_id,
         owner=request.user
@@ -614,6 +638,7 @@ def delete_store(request, store_id):
 @login_required
 @vendor_required
 def create_store(request):
+    '''Create a new store and redirect to the store list.'''
     if request.method == "POST":
         name = request.POST.get("name")
         description = request.POST.get("description")
@@ -632,6 +657,7 @@ def create_store(request):
 # Create a function to display the list of stores for the logged-in user
 @login_required
 def store_list(request):
+    '''Display the list of stores owned by the logged-in user.'''
     stores = Store.objects.filter(
         owner=request.user
     )
@@ -647,6 +673,7 @@ def store_list(request):
 @login_required
 @vendor_required
 def add_product(request):
+    '''Add a new product to a store owned by the logged-in vendor.'''
     stores = Store.objects.filter(
         owner=request.user
     )
@@ -684,6 +711,7 @@ def add_product(request):
 @login_required
 @vendor_required
 def vendor_products(request):
+    '''Display the list of products owned by the logged-in vendor.'''
     products = Product.objects.filter(
         store__owner=request.user
     )
@@ -699,6 +727,7 @@ def vendor_products(request):
 @login_required
 @vendor_required
 def edit_product(request, product_id):
+    '''Edit a product's details and save the changes.'''
     product = Product.objects.get(
         id=product_id,
         store__owner=request.user
@@ -724,6 +753,7 @@ def edit_product(request, product_id):
 @login_required
 @vendor_required
 def delete_product(request, product_id):
+    '''Delete a product and redirect to the vendor's product list.'''
     product = Product.objects.get(
         id=product_id,
         store__owner=request.user
@@ -736,6 +766,7 @@ def delete_product(request, product_id):
 
 # Create a function to display the list of products
 def product_list(request):
+    '''Display the list of all products available in the store.'''
     products = Product.objects.all()
 
     return render(
@@ -749,6 +780,7 @@ def product_list(request):
 @login_required
 @buyer_required
 def add_review(request, product_id):
+    '''Add a review for a product and redirect to the product list.'''
     if request.method == "POST":
         product = Product.objects.get(
             id=product_id
@@ -779,6 +811,7 @@ def add_review(request, product_id):
 @login_required
 @buyer_required
 def checkout(request):
+    '''Handle the checkout process'''
     cart = retrieve_products(request)
 
     if not cart:
@@ -849,6 +882,7 @@ def checkout(request):
 
 # Create a function to provide a basic API response with serialized store data
 def basic_api_response(request):
+    '''Provide a basic API response with serialized store data.'''
     if request.method == "GET":
         data = serializers.serialize(
             "json",

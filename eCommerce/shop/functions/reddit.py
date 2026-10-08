@@ -4,6 +4,7 @@ import requests
 
 
 def get_reddit_posts(subreddit="python"):
+    '''Fetch the latest posts from the specified subreddit.'''
     # Build the URL for the subreddit RSS feed
     url = f"https://www.reddit.com/r/{subreddit}/.rss"
 
