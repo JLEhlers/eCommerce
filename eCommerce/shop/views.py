@@ -29,6 +29,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_xml.renderers import XMLRenderer
 
+from .functions.reddit import get_reddit_posts
 from .models import (
     Order,
     OrderItem,
@@ -38,7 +39,7 @@ from .models import (
     Store,
     UserProfile,
 )
-from .serializers import StoreSerializer
+from .serializers import ProductSerializer, ReviewSerializer, StoreSerializer
 
 
 # Create a function to register a new user
@@ -197,6 +198,115 @@ def add_store(request):
         serializer.errors,
         status=status.HTTP_400_BAD_REQUEST
     )
+
+
+# Create a function to add a product using the API
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def add_product_api(request):
+
+    if not hasattr(request.user, 'userprofile'):
+        return Response(
+            {"error": "User profile not found."},
+            status=400
+        )
+
+    if request.user.userprofile.role != "vendor":
+        return Response(
+            {"error": "Only vendors can add products."},
+            status=403
+        )
+
+    store_id = request.data.get('store')
+
+    try:
+        store = Store.objects.get(id=store_id)
+    except Store.DoesNotExist:
+        return Response(
+            {"error": "Store not found."},
+            status=404
+        )
+
+    if store.owner != request.user:
+        return Response(
+            {"error": "You can only add products to your own store."},
+            status=403
+        )
+
+    serializer = ProductSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save(store=store)
+        return Response(
+            serializer.data,
+            status=201
+        )
+
+    return Response(serializer.errors, status=400)
+
+
+# Create a function to retrieve reviews using the API
+@api_view(['GET'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_reviews_api(request):
+    """Allow authenticated vendors to retrieve reviews."""
+    
+    if not hasattr(request.user, 'userprofile'):
+        return Response(
+            {"error": "User profile not found."},
+            status=400
+        )
+
+    if request.user.userprofile.role != "vendor":
+        return Response(
+            {"error": "Only vendors can retrieve reviews."},
+            status=403
+        )
+
+    reviews = Review.objects.all()
+
+    serializer = ReviewSerializer(reviews, many=True)
+
+    return Response(serializer.data)
+
+
+# Create a function to retrieve stores belonging to a vendor using the API
+@api_view(['GET'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_vendor_stores(request, vendor_id):
+    """Retrieve stores belonging to a vendor."""
+
+    stores = Store.objects.filter(owner_id=vendor_id)
+
+    serializer = StoreSerializer(stores, many=True)
+
+    return Response(serializer.data)
+
+
+# Create a function to retrieve products belonging to a store using the API
+@api_view(['GET'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_store_products(request, store_id):
+    """Retrieve products belonging to a store."""
+
+    products = Product.objects.filter(store_id=store_id)
+
+    serializer = ProductSerializer(products, many=True)
+
+    return Response(serializer.data)
+
+
+# Create a function to fetch and display Reddit posts
+def reddit_feed(request):
+    # Call our helper function to fetch posts
+    posts = get_reddit_posts("python")
+
+    # Pass the posts into the template
+    return render(request, "shop/reddit_feed.html", {"posts": posts})
 
 
 # Create a function to display the product page

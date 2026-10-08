@@ -169,4 +169,47 @@ urlpatterns = [
         views.request_password_reset,
         name='request_password_reset'
     ),
+
+    # Reddit feed
+    path(
+        "reddit/",
+        views.reddit_feed,
+        name="reddit_feed"
+    ),
+
+    # Add Store API
+    path(
+        'api/stores/add/',
+        views.add_store,
+        name='add_store'
+        ),
+
+    # Add Product API
+    path(
+        'api/products/add/',
+        views.add_product_api,
+        name='add_product_api'
+        ),
+
+    # Add Review API
+    path(
+        'api/reviews/',
+        views.get_reviews_api,
+        name='get_reviews_api'
+        ),
+
+    # Get Vendor Stores API
+    path(
+        'api/vendors/<int:vendor_id>/stores/',
+        views.get_vendor_stores,
+        name='get_vendor_stores'
+    ),
+
+    # Get Store Products API
+    path(
+        'api/stores/<int:store_id>/products/',
+        views.get_store_products,
+        name='get_store_products'
+    ),
+
 ]
