@@ -1,0 +1,72 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <!-- Dashboard heading -->
+    <div class="mb-4">
+        <h1 class="fw-bold">Vendor Dashboard</h1>
+        <p class="text-muted">
+            Welcome! Manage your stores and products from here.
+        </p>
+    </div>
+
+    <!-- Welcome card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <h4 class="card-title">Welcome, {{ user.username }}!</h4>
+            <p class="card-text text-muted">
+                Use the options below to manage your store and products.
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard options -->
+    <div class="row g-4">
+
+        <!-- Manage stores -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body p-4">
+                    <h4 class="card-title">My Stores</h4>
+                    <p class="card-text text-muted">
+                        Create a new store or view and manage your existing stores.
+                    </p>
+
+                    <a href="{% url 'shop:store_list' %}"
+                       class="btn btn-dark">
+                        Manage Stores
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage products -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body p-4">
+                    <h4 class="card-title">My Products</h4>
+                    <p class="card-text text-muted">
+                        Add products, update product details, and manage your listings.
+                    </p>
+
+                    <a href="{% url 'shop:product_list' %}"
+                       class="btn btn-dark">
+                        Manage Products
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Additional information -->
+    <div class="alert alert-light border mt-4">
+        <strong>Tip:</strong> Keep your store and product information up to date
+        so customers can find your products.
+    </div>
+
+</div>
+
+{% endblock %}
