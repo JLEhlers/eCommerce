@@ -323,48 +323,30 @@ def reddit_feed(request):
 
 
 # Create a function to display the product page
-def view_product_page(request):
-    '''Display the product page and handle product search.'''
-    user = request.user
 
-    if user.has_perm("shop.view_product"):
-        if request.method == "POST":
-            product_name = request.POST.get("product")
+# Display a product and its reviews
+@login_required
+def view_product_page(request, product_id):
+    """Display product details and reviews for a selected product."""
 
-            if not product_name:
-                return render(
-                    request,
-                    "shop/product_page.html",
-                    {"error": "No product name was given."}
-                )
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        return render(
+            request,
+            "shop/product_page.html",
+            {"error": "Product not found."}
+        )
 
-            try:
-                product = Product.objects.get(name=product_name)
-
-                reviews = Review.objects.filter(product=product)
-
-                return render(
-                    request,
-                    "shop/product_page.html",
-                    {
-                        "product": product,
-                        "reviews": reviews
-                     }
-                )
-
-            except ObjectDoesNotExist:
-                return render(
-                    request,
-                    "shop/product_page.html",
-                    {"error": "Product not found."}
-                )
-
-        return render(request, "shop/product_page.html")
+    reviews = Review.objects.filter(product=product)
 
     return render(
         request,
         "shop/product_page.html",
-        {"error": "You do not have permission to view this product."}
+        {
+            "product": product,
+            "reviews": reviews
+        }
     )
 
 
@@ -546,26 +528,83 @@ def generate_reset_url(user):
 
 # Create a function to reset a user's password using a token
 def reset_user_password(request, token):
-    '''Reset a user's password using a token and render the password reset page.'''
+    """Reset a user's password using a valid reset token."""
+
     try:
         user_token = ResetToken.objects.get(
             token=sha1(token.encode()).hexdigest()
         )
 
+        # Check whether the token has expired.
         if user_token.expiry_date.replace(tzinfo=None) < datetime.now():
             user_token.delete()
-            user_token = None
-        else:
-            request.session['user'] = user_token.user.username
-            request.session['token'] = token
+
+            return render(
+                request,
+                'shop/password_reset.html',
+                {
+                    'token': token,
+                    'error': 'This password reset link has expired.'
+                }
+            )
 
     except ResetToken.DoesNotExist:
-        user_token = None
+        return render(
+            request,
+            'shop/password_reset.html',
+            {
+                'token': token,
+                'error': 'This password reset link is invalid.'
+            }
+        )
+
+    # Process the submitted form.
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Check that both passwords match.
+        if password != confirm_password:
+            return render(
+                request,
+                'shop/password_reset.html',
+                {
+                    'token': token,
+                    'error': 'The passwords do not match. Please try again.'
+                }
+            )
+
+        # Check that a password was entered.
+        if not password:
+            return render(
+                request,
+                'shop/password_reset.html',
+                {
+                    'token': token,
+                    'error': 'Please enter a new password.'
+                }
+            )
+
+        # Save the new password securely.
+        user = user_token.user
+        user.set_password(password)
+        user.save()
+
+        # Delete the token after a successful reset.
+        user_token.delete()
+
+        return render(
+            request,
+            'shop/password_reset.html',
+            {
+                'success': 'Your password has been reset successfully.'
+            }
+        )
 
     return render(
         request,
         'shop/password_reset.html',
-        {'token': user_token}
+        {'token': token}
     )
 
 

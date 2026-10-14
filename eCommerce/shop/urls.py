@@ -47,12 +47,12 @@ urlpatterns = [
         views.welcome,
         name='welcome'
     ),
-    
+
     # Basic API Response
     path(
         'basic_response/', basic_api_response
     ),
-    
+
     # View Stores
     path(
         'get/stores', view_stores
@@ -212,4 +212,10 @@ urlpatterns = [
         name='get_store_products'
     ),
 
+    # Product pages
+    path(
+        'products/<int:product_id>/',
+        views.view_product_page,
+        name='product_detail'
+    ),
 ]
