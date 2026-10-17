@@ -61,7 +61,7 @@ python -m venv myenv
 Activate it in Windows PowerShell:
 
 ```powershell
-.\myenv\Scripts\Activate.ps1
+myenv\Scripts\activate
 ```
 
 If you are using Command Prompt instead, run:
