@@ -8,7 +8,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.http import (
     HttpResponseForbidden,
@@ -41,16 +40,32 @@ from .models import (
 )
 from .serializers import ProductSerializer, ReviewSerializer, StoreSerializer
 
-
 # Create a function to register a new user
+
+
 def register_user(request):
-    '''Register a new user and create a UserProfile with the selected role.'''
+    """Register a user and prevent duplicate email addresses."""
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        password_confirm = request.POST.get("password_confirm")
-        email = request.POST.get("email")
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip().lower()
+        password = request.POST.get("password", "")
+        password_confirm = request.POST.get("password_confirm", "")
         role = request.POST.get("role")
+
+        if not email:
+            return render(
+                request,
+                "shop/register.html",
+                {"error": "Please enter an email address."}
+            )
+
+        # Check whether this email is already registered.
+        if User.objects.filter(email__iexact=email).exists():
+            return render(
+                request,
+                "shop/register.html",
+                {"error": "This email address is already registered."}
+            )
 
         if password != password_confirm:
             return render(
@@ -70,10 +85,8 @@ def register_user(request):
             role=role
         )
 
-        user.save()
         login(request, user)
-
-        return redirect(reverse("shop:welcome"))
+        return redirect("shop:welcome")
 
     return render(request, "shop/register.html")
 
@@ -276,7 +289,7 @@ def get_reviews_api(request):
             {"error": "Only vendors can retrieve reviews."},
             status=403
         )
-
+    
     reviews = Review.objects.all()
 
     serializer = ReviewSerializer(reviews, many=True)
@@ -433,7 +446,8 @@ def retrieve_products(request):
 
                 products.append({
                     'product': product,
-                    'quantity': quantity
+                    'quantity': quantity,
+                    'subtotal': product.price * quantity
                 })
 
             except Product.DoesNotExist:
@@ -929,3 +943,62 @@ def basic_api_response(request):
         )
 
         return JsonResponse(data=data, safe=False)
+
+
+# Update the quantity of an item in the cart.
+@login_required
+@buyer_required
+def update_cart(request):
+    """Update the quantity of a product in the buyer's cart."""
+    if request.method == "POST":
+        item = request.POST.get("item")
+        quantity = request.POST.get("quantity")
+        cart = request.session.get("cart", {})
+
+        if item not in cart:
+            return redirect("shop:cart_page")
+
+        try:
+            quantity = int(quantity)
+
+            if quantity < 1:
+                return redirect("shop:cart_page")
+
+        except (ValueError, TypeError):
+            return redirect("shop:cart_page")
+
+        cart[item] = quantity
+        request.session["cart"] = cart
+        request.session.modified = True
+
+    return redirect("shop:cart_page")
+
+
+# Remove one item from the cart.
+@login_required
+@buyer_required
+def remove_cart_item(request):
+    """Remove one product from the buyer's cart."""
+    if request.method == "POST":
+        item = request.POST.get("item")
+        cart = request.session.get("cart", {})
+
+        if item in cart:
+            del cart[item]
+
+        request.session["cart"] = cart
+        request.session.modified = True
+
+    return redirect("shop:cart_page")
+
+
+# Remove every item from the cart.
+@login_required
+@buyer_required
+def clear_cart(request):
+    """Empty the buyer's shopping cart."""
+    if request.method == "POST":
+        request.session["cart"] = {}
+        request.session.modified = True
+
+    return redirect("shop:cart_page")

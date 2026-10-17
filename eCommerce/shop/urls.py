@@ -1,7 +1,13 @@
 from django.urls import path
 
 from . import views
-from .views import basic_api_response, view_stores
+from .views import (
+    basic_api_response,
+    clear_cart,
+    remove_cart_item,
+    update_cart,
+    view_stores,
+)
 
 app_name = "shop"
 
@@ -217,5 +223,21 @@ urlpatterns = [
         'products/<int:product_id>/',
         views.view_product_page,
         name='product_detail'
+    ),
+
+    path(
+        "cart/update/",
+        update_cart,
+        name="update_cart"
+    ),
+    path(
+        "cart/remove/",
+        remove_cart_item,
+        name="remove_cart_item"
+    ),
+    path(
+        "cart/clear/",
+        clear_cart,
+        name="clear_cart"
     ),
 ]

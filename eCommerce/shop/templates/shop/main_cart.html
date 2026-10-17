@@ -21,28 +21,80 @@
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Subtotal</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
 
-                            {% for product in cart %}
+                            {% for item in cart %}
 
                                 <tr>
                                     <td>
-                                        {{ product.product.name }}
+                                        {{ item.product.name }}
                                     </td>
 
                                     <td>
-                                        {{ product.quantity }}
+                                        <form
+                                            method="POST"
+                                            action="{% url 'shop:update_cart' %}"
+                                            class="d-flex gap-2"
+                                        >
+                                            {% csrf_token %}
+
+                                            <input
+                                                type="hidden"
+                                                name="item"
+                                                value="{{ item.product.name }}"
+                                            >
+
+                                            <input
+                                                type="number"
+                                                name="quantity"
+                                                value="{{ item.quantity }}"
+                                                min="1"
+                                                class="form-control"
+                                                style="width: 85px;"
+                                                required
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-primary btn-sm"
+                                            >
+                                                Update
+                                            </button>
+                                        </form>
                                     </td>
 
                                     <td>
-                                        ${{ product.product.price }}
+                                        ${{ item.product.price|floatformat:2 }}
                                     </td>
 
                                     <td>
-                                        ${{ product.product.price|floatformat:2 }}
+                                        ${{ item.subtotal|floatformat:2 }}
+                                    </td>
+
+                                    <td>
+                                        <form
+                                            method="POST"
+                                            action="{% url 'shop:remove_cart_item' %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <input
+                                                type="hidden"
+                                                name="item"
+                                                value="{{ item.product.name }}"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-danger btn-sm"
+                                            >
+                                                Remove
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
 
@@ -55,21 +107,39 @@
                 </div>
 
                 <!-- Cart Buttons -->
-                <div class="d-flex flex-wrap gap-2 mt-4">
+                <div class="d-flex flex-wrap gap-2 justify-content-between mt-4">
 
-                    <a
-                        href="{% url 'shop:product_list' %}"
-                        class="btn btn-outline-dark"
+                    <form
+                        method="POST"
+                        action="{% url 'shop:clear_cart' %}"
                     >
-                        Continue Shopping
-                    </a>
+                        {% csrf_token %}
 
-                    <a
-                        href="{% url 'shop:checkout' %}"
-                        class="btn btn-dark"
-                    >
-                        Proceed to Checkout
-                    </a>
+                        <button
+                            type="submit"
+                            class="btn btn-outline-danger"
+                        >
+                            Clear Cart
+                        </button>
+                    </form>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <a
+                            href="{% url 'shop:product_list' %}"
+                            class="btn btn-outline-dark"
+                        >
+                            Continue Shopping
+                        </a>
+
+                        <a
+                            href="{% url 'shop:checkout' %}"
+                            class="btn btn-dark"
+                        >
+                            Proceed to Checkout
+                        </a>
+
+                    </div>
 
                 </div>
 
